@@ -1,0 +1,5 @@
+{
+    "name": "vault-client",
+    "mount_accessor": "auth_oidc_819324ad",
+    "canonical_id": "760ca895-34b6-cfe6-c1f0-e32901ad34cd"
+}

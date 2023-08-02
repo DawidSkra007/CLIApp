@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+      image: postgres:12.2
+      container_name: postgres
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+
+  keycloak:
+      image: codingpuss/keycloak-silicon:16.1.1
+      container_name: keycloak
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin # username
+        KEYCLOAK_PASSWORD: password # password
+        PROXY_ADDRESS_FORWARDING: "true"
+      ports:
+        - 8080:8080
+      depends_on:
+        - postgres
+
+  vault:
+    image: vault:latest
+    container_name: vault
+    ports:
+      - 8400:8400
+    volumes:
+      - ./config2.hcl:/vault/config/config2.hcl
+      - ./vault-data2:/vault-data2
+    command:
+      - "server"
+    environment:
+      VAULT_ADDR: http://127.0.0.1:8400 
+      VAULT_API_ADDR: http://127.0.0.1:8400 
+    cap_add:
+      - IPC_LOCK

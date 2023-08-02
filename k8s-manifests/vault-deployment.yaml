@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yml
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: vault
+  name: vault
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      io.kompose.service: vault
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yml
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: vault
+    spec:
+      containers:
+        - args:
+            - server
+          env:
+            - name: VAULT_ADDR
+              value: http://0.0.0.0:8400
+            - name: VAULT_API_ADDR
+              value: http://0.0.0.0:8400
+          image: vault:latest
+          name: vault
+          ports:
+            - containerPort: 8400
+          resources: {}
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+          volumeMounts:
+            - mountPath: /vault/config/config2.hcl
+              name: vault-claim0
+            - mountPath: /vault-data2
+              name: vault-claim1
+      restartPolicy: Always
+      volumes:
+        - name: vault-claim0
+          persistentVolumeClaim:
+            claimName: vault-claim0
+        - name: vault-claim1
+          persistentVolumeClaim:
+            claimName: vault-claim1
+status: {}
